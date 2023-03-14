@@ -1,3 +1,4 @@
+# Configurando Zabbix para enviar eventos ao Telegram
 Para configurar o Zabbix para enviar alertas para o Telegram, siga os seguintes passos:
 
 1 - Criar um bot no Telegram:
