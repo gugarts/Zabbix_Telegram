@@ -1,1 +1,64 @@
+Para configurar o Zabbix para enviar alertas para o Telegram, siga os seguintes passos:
 
+1 - Criar um bot no Telegram:
+
+   - Abra o Telegram e pesquise por "BotFather" na barra de pesquisa.
+   - Clique em iniciar e siga as instruções do BotFather para criar um novo bot.
+   - Anote o token gerado pelo BotFather, ele será necessário para configurar o Zabbix.
+
+2 - Obter o chat ID do Telegram:
+
+   - Pesquise pelo bot que acabou de criar no Telegram.
+   - Envie uma mensagem para o bot.
+   - Acesse a URL https://api.telegram.org/bot[TOKEN]/getUpdates substituindo [TOKEN] pelo token gerado pelo BotFather.
+   - Procure a chave "chat" e anote o valor do campo "id", este é o chat ID que será utilizado para enviar as mensagens do Zabbix.
+
+3 - Configurar o media type no Zabbix:
+
+   - Acesse o Zabbix e vá para "Administração" -> "Tipos de mídia".
+   - Clique em "Criar tipo de mídia".
+   - Preencha os campos da seguinte forma:
+     - Tipo: Script
+     - Nome: Telegram
+     - Script nome: informe o caminho completo para o script que será utilizado para enviar o alerta. Exemplo: /usr/lib/zabbix/alertscripts/telegram.sh
+     - Parâmetros: {ALERT.SENDTO}, {ALERT.SUBJECT}, {ALERT.MESSAGE}
+  
+  Clique em "Adicionar".
+
+
+4 - Configurar o script de envio para o Telegram:
+
+  - Crie um arquivo chamado "telegram.sh" no diretório "/usr/lib/zabbix/alertscripts/" (ou em outro diretório de sua escolha).
+  - Copie e cole o seguinte código no arquivo e salve:
+
+```
+#!/bin/bash
+# Script para enviar alertas do Zabbix para o Telegram
+
+TOKEN="seu_token_aqui"
+CHAT_ID="seu_chat_id_aqui"
+
+URL="https://api.telegram.org/bot$TOKEN/sendMessage"
+
+if [ $# -ne 3 ]; then
+    echo "Usage: $0 <sendto> <subject> <message>"
+    exit 1
+fi
+
+sendto=$1
+subject=$2
+message=$3
+
+text="$subject%0A$message"
+
+curl -s -X POST $URL -d chat_id=$CHAT_ID -d text="$text" >/dev/null
+
+if [ $? -eq 0 ]; then
+    echo "Mensagem enviada com sucesso para o Telegram!"
+else
+    echo "Erro ao enviar mensagem para o Telegram."
+fi
+```
+
+5 - Substitua o valor da variável TOKEN pelo token gerado pelo BotFather e o valor da variável CHAT_ID pelo chat ID obtido anteriormente.
+  - Dê permissão de execução ao arquivo: chmod +x /usr/lib/zabbix/alertscripts/telegram.sh
