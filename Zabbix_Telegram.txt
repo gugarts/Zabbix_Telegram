@@ -1,0 +1,36 @@
+Para configurar o Zabbix para enviar alertas para o Telegram, siga os seguintes passos:
+
+1 - Crie um bot no Telegram
+
+   - Abra o aplicativo Telegram e pesquise por "@BotFather"
+   - Envie a mensagem "/newbot" para iniciar a criação de um novo bot
+   - Siga as instruções para dar um nome e um username ao bot
+   - Após a criação do bot, você receberá um token de acesso que será usado posteriormente para configurar o Zabbix.
+   - Crie um grupo no Telegram para receber os alertas
+
+2 - Abra o aplicativo Telegram e crie um novo grupo
+   - Adicione o bot criado anteriormente ao grupo
+   - Para obter o chat ID do grupo, abra o seguinte link no seu navegador web: https://api.telegram.org/bot<SEU_TOKEN>/getUpdates (substitua <SEU_TOKEN> pelo token de acesso do seu bot)
+   - Localize a seção "result" na resposta JSON e copie o valor do campo "chat_id". Este é o ID do chat que será usado posteriormente para configurar o Zabbix.
+   - Instale o script "zabbix-telegram.sh"
+
+3 - Faça o download do script "zabbix-telegram.sh" em https://github.com/ableev/Zabbix-in-Telegram/blob/master/zabbix-telegram.sh
+   - Copie o arquivo para um diretório no servidor Zabbix (por exemplo, /usr/lib/zabbix/alertscripts/)
+   - Dê permissão de execução ao arquivo com o comando "chmod +x zabbix-telegram.sh"
+   - Configure o Zabbix para enviar alertas via Telegram
+
+4 - Abra o painel de administração do Zabbix e vá para "Administração" -> "Tipos de mídia"
+   - Clique em "Criar tipo de mídia" e preencha as seguintes informações:
+   - Nome: Telegram
+   - Tipo: Script
+   - Nome do script: zabbix-telegram.sh
+   - Clique em "Atualizar" para salvar as configurações
+   - Vá para "Administração" -> "Usuários" e selecione o usuário que deseja receber alertas via Telegram
+   - Clique em "Editar" e vá para a guia "Mídia"
+   - Clique em "Adicionar" e preencha as seguintes informações:
+   - Tipo de mídia: Telegram (o nome do tipo de mídia criado anteriormente)
+   - Enviar para: <ID_DO_CHAT> (substitua <ID_DO_CHAT> pelo chat ID obtido anteriormente)
+   - Clique em "Atualizar" para salvar as configurações
+
+A partir de agora, o Zabbix enviará alertas para o grupo no Telegram sempre que um evento for disparado.
+Certifique-se de que o bot esteja presente no grupo e que o chat ID esteja correto na configuração do usuário.
